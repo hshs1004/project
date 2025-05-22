@@ -44,6 +44,9 @@ sequenceDiagram
 
     AppServer->>AppWeb: 트랜잭션 종료
 
-위 코드로 시퀀스 다이어 그램을 만들면 
+위 코드로 시퀀스 다이어그램을 만들면 
 ![image](https://github.com/user-attachments/assets/f0bc0a2e-20b6-4abe-b329-392f2eee24b0)
 위 사진과 같습니다.
+
+시퀀스 다이어그램을 기반으로 코드를 만들었습니다. 
+
