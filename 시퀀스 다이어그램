@@ -1,0 +1,35 @@
+인터넷 은행 시스템의 시퀀스 다이어 그램 코드 입니다.
+
+sequenceDiagram
+    participant User as 사용자
+    participant AppWeb as 모바일 앱/웹 브라우저
+    participant AppServer as 애플리케이션 서버
+    participant Database as 데이터베이스
+    participant ExternalGateway as 외부 금융망/결제 게이트웨이
+
+    User->>AppWeb: 로그인 정보 입력
+    AppWeb->>AppServer: 로그인 요청
+    AppServer->>Database: 사용자 정보 확인
+    Database-->>AppServer: 사용자 정보 반환
+    AppServer-->>AppWeb: 로그인 성공 응답
+    AppWeb-->>User: 로그인 성공 화면 표시
+
+    User->>AppWeb: 이체 정보 입력 (받는 사람, 금액 등)
+    AppWeb->>AppServer: 이체 요청 (트랜잭션 시작)
+    AppServer->>Database: 출금 계좌 잔액 확인
+    Database-->>AppServer: 잔액 정보 반환
+
+    alt 잔액 충분
+        AppServer->>ExternalGateway: 이체 승인 요청 (외부 금융망 통신)
+        ExternalGateway-->>AppServer: 이체 승인 응답
+        AppServer->>Database: 출금 계좌 잔액 감소 및 이체 내역 기록
+        AppServer->>Database: 입금 계좌 잔액 증가 및 이체 내역 기록
+        Database-->>AppServer: DB 업데이트 완료 응답
+        AppServer-->>AppWeb: 이체 성공 응답
+        AppWeb-->>User: 이체 완료 화면 표시
+    else 잔액 부족 또는 오류
+        AppServer-->>AppWeb: 이체 실패 응답 (오류 메시지 포함)
+        AppWeb-->>User: 이체 실패 화면 및 오류 메시지 표시
+    end
+
+    AppServer->>AppWeb: 트랜잭션 종료
