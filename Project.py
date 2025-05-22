@@ -1,16 +1,15 @@
 import time
 
 class Database:
-    def init(self):
-    # 사용자 데이터: 사용자명: {password: 암호, balance: 잔액, history: 거래내역 리스트}
-     self.users = {
-    "alice": {"password": "alice123", "balance": 1000, "history": []},
-    "bob": {"password": "bob123", "balance": 500, "history": []},
-    }
+    def __init__(self):  # 생성자 함수 이름 수정
+        # 사용자 데이터: 사용자명: {password, balance, history}
+        self.users = {
+            "alice": {"password": "alice123", "balance": 1000, "history": []},
+            "bob": {"password": "bob123", "balance": 500, "history": []},
+        }
 
     # 사용자 로그인 정보 확인
     def verify_user_credentials(self, username, password):
-        # 사용자 존재 여부 및 비밀번호 매칭 확인
         if username in self.users and self.users[username]["password"] == password:
             return True
         return False
@@ -21,31 +20,29 @@ class Database:
             return self.users[username]["balance"]
         return None
 
-    # 계좌 잔액 업데이트
-    def update_balance(self, username, new_balance):
-        if username in self.users:
-            self.users[username]["balance"] = new_balance
-            return True
-        return False
+    # 이체 처리
+    def transfer(self, sender, receiver, amount):
+        if sender not in self.users or receiver not in self.users:
+            return False, "사용자 정보 오류"
+        if self.users[sender]["balance"] < amount:
+            return False, "잔액 부족"
 
-    # 거래 내역 기록 (출금 및 입금 내역 기록)
-    def record_transaction(self, from_user, to_user, amount):
-        # 출금 내역 기록
-        if from_user in self.users:
-            self.users[from_user]["history"].append({
-                "type": "debit",
-                "amount": amount,
-                "to": to_user,
-                "timestamp": time.time()
-            })
-        # 입금 내역 기록
-        if to_user in self.users:
-            self.users[to_user]["history"].append({
-                "type": "credit",
-                "amount": amount,
-                "from": from_user,
-                "timestamp": time.time()
-            })
+        # 이체 처리
+        self.users[sender]["balance"] -= amount
+        self.users[receiver]["balance"] += amount
+
+        # 거래 내역 저장
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        self.users[sender]["history"].append(f"{timestamp} - Sent {amount} to {receiver}")
+        self.users[receiver]["history"].append(f"{timestamp} - Received {amount} from {sender}")
+
+        return True, "이체 완료"
+
+    # 거래 내역 조회
+    def get_transaction_history(self, username):
+        if username in self.users:
+            return self.users[username]["history"]
+        return None
 
 class ExternalGateway:
     # 이체 승인 요청을 시뮬레이션하는 메서드 
@@ -140,4 +137,3 @@ class AppWeb:
       external_gateway = ExternalGateway()
       app_server = AppServer(database, external_gateway)
       app_web = AppWeb(app_server)
-
