@@ -35,3 +35,4 @@ sequenceDiagram
     AppServer->>AppWeb: 트랜잭션 종료
 
 해당 코드를 Mermaid live를 통해 시퀀스 다이어그램으로 표현한 사진입니다.
+![image](https://github.com/user-attachments/assets/f0bc0a2e-20b6-4abe-b329-392f2eee24b0)
